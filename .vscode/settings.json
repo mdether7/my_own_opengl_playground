@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "call.h": "c",
+    "stdio.h": "c",
+    "shader_type.h": "c",
+    "glad.h": "c"
+  }
+}
