@@ -13,11 +13,17 @@
   // [02 12 22 32]
   // [03 13 23 33]
 
+  // CPU Frame
+  // update_game_logic();           // Positions, rotations
+  // dispatch_compute_culling();    // GPU does frustum culling
+  // dispatch_compute_animation();  // GPU builds final matrices
+  // draw_indirect();              // GPU draws visible objects
+
 
 typedef enum { IDLE = 0, FORWARD, BACKWARD, TO_LEFT, TO_RIGHT } cube_state;
 typedef enum { CUBE = 0, RUBIX } model;
 
-static int SCREEN_WIDTH   = 800;
+static int  SCREEN_WIDTH  = 800;
 static int SCREEN_HEIGHT  = 600;
 static char* WINDOW_NAME  = "CUBE";
 
@@ -195,6 +201,25 @@ int main(void)
     return 1;
 
   
+#if 0
+  float spacing = 1.0f;
+  float gap     = 0.0f;
+
+  for (int i = 0; i < 10; i++)
+    for (int j = 0; j < 10; j++)
+      for (int k = 0; k < 10; k++) {
+
+        mat4 destination_mat;
+
+        glmc_mat4_identity(destination_mat);
+        glmc_translate(destination_mat, (vec3){i*(spacing+gap), j*(spacing+gap), k*(spacing+gap)});
+
+        glmc_mat4_print(destination_mat, stdout);
+        
+      }
+#endif
+
+
 
   // openGL options
   glEnable(GL_DEPTH_TEST);
@@ -202,11 +227,6 @@ int main(void)
   glCullFace(GL_BACK);  
   glClearDepth(1.0f);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-
-  mat4 att;
-
-  printf("%zu\n", sizeof(att));
 
 
   while (!glfwWindowShouldClose(window))

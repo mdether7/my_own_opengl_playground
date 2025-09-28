@@ -6,7 +6,7 @@
 #include <cglm/types.h>
 #include <stddef.h>
 
-// #define GRID_MAX_SIZE_VOLUME MAYBE?
+#define GRID_MAX_SIZE_VOLUME 1000 // 10x10x10
 
 typedef struct object_s Object; // or shoudl i call it primitive?
 
@@ -25,7 +25,7 @@ typedef struct grid_object_s {
 
 // TODO(mdether7): ADD SCALING OR SOME SHIT tO THOSE GRID TYPE OBJECTS
 
-Grid_object* grid_create(Dimensions dims, const vec3 star_pos, const Object* primitive);
+Grid_object* grid_create(Dimensions dims, const vec3 star_pos, float spacing, const Object* primitive);
 void         grid_resize(Grid_object* grid, vec3 dims);
 void         grid_destroy(Grid_object* grid);
 
