@@ -204,6 +204,11 @@ int main(void)
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 
+  mat4 att;
+
+  printf("%zu\n", sizeof(att));
+
+
   while (!glfwWindowShouldClose(window))
   {
     process_input(window);
