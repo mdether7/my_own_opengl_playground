@@ -3,6 +3,11 @@
 layout (location = 0) in vec3 attribute_pos;
 layout (location = 1) in vec3 attribute_color;
 
+layout (std140) uniform Matrices
+{
+  mat4 model_grid[1000];
+};
+
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;

@@ -41,6 +41,7 @@ bool debug_colors_draw        = false;
 static GLFWwindow* initialize_glfw(unsigned int width, unsigned int height, const char* title);
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+static void print_some_debug_info(void);
 static void process_input(GLFWwindow* window);
 static void rotate_cube(cube_state direction);
 static void update_cube(double time);
@@ -205,6 +206,24 @@ int main(void)
   // load grid
   Grid_object* grid = grid_create((Dimensions){3, 3, 3}, (vec3){0, 0, 0}, 1.0f, &cube);
 
+  printf("COUNT %zu\n", grid->matrix_count);
+  printf("BYTE %zu\n", grid->matrix_bytes);
+  fflush(stdout);
+
+  #define GRID_BIND_SPOT 0
+
+  // get index from the shader of this ubo block
+  GLuint grid_mats = glGetUniformBlockIndex(shader.ID, "Matrices");  
+  
+  // bind this spot to GRID_BIND_SPOT
+  glUniformBlockBinding(shader.ID, grid_mats, GRID_BIND_SPOT);
+
+  // bind buffer to thie GRID_BIND_SPOT
+  glBindBufferBase(GL_UNIFORM_BUFFER, GRID_BIND_SPOT, grid->UBO);
+
+
+
+
   // openGL options
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -212,6 +231,7 @@ int main(void)
   glClearDepth(1.0f);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+  print_some_debug_info();
 
   while (!glfwWindowShouldClose(window))
   {
@@ -241,17 +261,16 @@ int main(void)
     }
     
     // render
+    object_bind(&cube);
     switch (current_model)
     {
       case CUBE:
-        object_bind(&cube);
         glDrawElements(GL_TRIANGLES,
                       sizeof(cube_indices) / sizeof(GLushort),
                       GL_UNSIGNED_SHORT,
                       0);
       break;
       case RUBIX:
-        object_bind(&cube);
         glDrawElements(GL_TRIANGLES,
                       sizeof(cube_indices) / sizeof(GLushort),
                       GL_UNSIGNED_SHORT,
@@ -289,4 +308,17 @@ int main(void)
   glfwTerminate();
 
   return 0;
+}
+
+static void print_some_debug_info(void)
+{
+  GLint64 maxBlockSize = 0;
+  glGetInteger64v(GL_MAX_UNIFORM_BLOCK_SIZE, &maxBlockSize);
+  printf("Max UBO size: %lld bytes\n", (long long)maxBlockSize);
+
+  GLint bindings = 0;
+  glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &bindings);
+
+  printf("Max UBO bindings: %d\n", bindings);
+  fflush(stdout);
 }

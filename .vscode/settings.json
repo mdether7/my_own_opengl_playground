@@ -3,6 +3,8 @@
     "call.h": "c",
     "stdio.h": "c",
     "shader_type.h": "c",
-    "glad.h": "c"
+    "glad.h": "c",
+    "dims.h": "c",
+    "grid.h": "c"
   }
 }

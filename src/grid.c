@@ -3,6 +3,7 @@
 #include "dims.h"
 
 #include <cglm/call.h>
+#include <glad/glad.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -10,6 +11,7 @@ void grid_destroy(Grid_object* grid)
 {
   if (grid != NULL) {
     free(grid->model_matrices);
+    glDeleteBuffers(1, &grid->UBO);
     free(grid);
   }
 }
@@ -59,6 +61,12 @@ Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Ob
   
   grid->matrix_count = (size_t)dimensions_get_volume(dims);
   grid->matrix_bytes = grid->matrix_count * sizeof(mat4);
+
+  grid->UBO = 0;
+  glGenBuffers(1, &grid->UBO);
+  glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
+  glBufferData(GL_UNIFORM_BUFFER, grid->matrix_bytes, grid->model_matrices, GL_STATIC_DRAW);
+  glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
   return grid;
 }

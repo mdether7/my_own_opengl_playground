@@ -4,6 +4,7 @@
 #include "dims.h"
 
 #include <cglm/types.h>
+#include <glad/glad.h>
 #include <stddef.h>
 
 #define GRID_MAX_SIZE_VOLUME 1000 // 10x10x10
@@ -17,6 +18,7 @@ typedef struct grid_object_s {
 
   const Object*    primitive;
 
+  GLuint           UBO; 
   mat4*            model_matrices;
   size_t           matrix_count;    
   size_t           matrix_bytes;
