@@ -43,7 +43,7 @@ Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Ob
   }
 
 
-  float gap = 0.0f;
+  float gap = 1.5f;
   size_t count = 0;
   for (unsigned int i = 0; i < dims.width; i++)
     for (unsigned int j = 0; j < dims.height; j++)
@@ -52,7 +52,7 @@ Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Ob
         mat4 mat;
 
         glmc_mat4_identity(mat);
-        glmc_translate(mat, (vec3){i*(spacing+gap), j*(spacing+gap), k*(spacing+gap)});
+        glmc_translate(mat, (vec3){i*(spacing+gap) - 1.0f, j*(spacing+gap), k*(spacing+gap) + -5.0f});
 
         memcpy((grid->model_matrices + count), mat, sizeof(mat));
         count++;

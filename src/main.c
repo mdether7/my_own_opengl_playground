@@ -34,7 +34,7 @@ mat4 projection_matrix    = GLM_MAT4_IDENTITY_INIT;
 versor orientation        = GLM_QUAT_IDENTITY_INIT; // unused for now!
 
 cube_state current_cube_state = IDLE;
-model current_model           = CUBE;
+model current_model           = RUBIX;
 float rotation_speed          = 2.0f;
 bool debug_colors_draw        = false;
 
@@ -204,7 +204,9 @@ int main(void)
 
   
   // load grid
-  Grid_object* grid = grid_create((Dimensions){3, 3, 3}, (vec3){0, 0, 0}, 1.0f, &cube);
+  Grid_object* grid = grid_create((Dimensions){10, 10, 10}, (vec3){0, 0, 0}, 1.0f, &cube);
+  if (grid == NULL)
+    return 1;
 
   printf("COUNT %zu\n", grid->matrix_count);
   printf("BYTE %zu\n", grid->matrix_bytes);
@@ -224,6 +226,8 @@ int main(void)
 
 
 
+
+
   // openGL options
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -235,17 +239,20 @@ int main(void)
 
   while (!glfwWindowShouldClose(window))
   {
-    static int t = 0;
     process_input(window);
 
     // clear screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    float ff = 20.0f * (float)sin(glfwGetTime());
+    printf("%f", ff);
+
     glmc_mat4_identity(model_matrix);
     update_cube(glfwGetTime());
 
-    // camera did not move, so it's (0,0,0) looking at -Z.
-    glmc_perspective(glm_rad(60.0f), ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT), 0.1f, 10.0f, projection_matrix);
+    glmc_mat4_identity(view_matrix);
+    glm_lookat((vec3){0.0f, 0.0f, 50.0f}, (vec3){-ff, ff, 0.0f}, (vec3){0.0f, 1.0f, 0.0f}, view_matrix);
+    glmc_perspective(glm_rad(60.0f), ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT), 0.1f, 100.0f, projection_matrix);
 
     shader_bind(&shader);
 
@@ -253,12 +260,26 @@ int main(void)
     shader_send_uniform_int(&shader, debug_colors_draw ? 1 : 0, "debug_color_flag");
     shader_send_uniform_vec3(&shader, 6, (float*)cube_alternative_color, "debug_color_array");
     shader_send_uniform_mat4(&shader, model_matrix, "model");
-    
-    if (t++ == 0) { // DIRTY FLAG ALPHA 
-      // Only update those when camera/projection change
-      shader_send_uniform_mat4(&shader, view_matrix, "view");
-      shader_send_uniform_mat4(&shader, projection_matrix, "projection");
+    shader_send_uniform_mat4(&shader, view_matrix, "view");
+    shader_send_uniform_mat4(&shader, projection_matrix, "projection");
+
+    glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
+
+    mat4* matrices = (mat4*)glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+    if (matrices) {
+      // change first matrix
+      for (int i = 0; i < grid->matrix_count; i++) {
+        glmc_mat4_copy(grid->model_matrices[i], matrices[i]);
+        glmc_translate(matrices[i], (vec3){0.0f, (float)sin(glfwGetTime()) * 5.0f, 0.0f});
+      }
+      
+      // change more matrices as needed...
+      
+      glUnmapBuffer(GL_UNIFORM_BUFFER);
     }
+
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
     
     // render
     object_bind(&cube);
@@ -271,18 +292,24 @@ int main(void)
                       0);
       break;
       case RUBIX:
-        glDrawElements(GL_TRIANGLES,
-                      sizeof(cube_indices) / sizeof(GLushort),
-                      GL_UNSIGNED_SHORT,
-                      0);
+        // Draw all instances in one drwa call
+        glDrawElementsInstanced(GL_TRIANGLES,
+                                sizeof(cube_indices) / sizeof(GLushort),
+                                GL_UNSIGNED_SHORT,
+                                0,
+                                grid->matrix_count);
+        // glDrawElements(GL_TRIANGLES,
+        //               sizeof(cube_indices) / sizeof(GLushort),
+        //               GL_UNSIGNED_SHORT,
+        //               0);
 
-        glmc_translate(model_matrix, (vec3){2.0f, (float)sin(glfwGetTime()), -5.0f});
-        shader_send_uniform_mat4(&shader, model_matrix, "model");
+        // glmc_translate(model_matrix, (vec3){2.0f, (float)sin(glfwGetTime()), -5.0f});
+        // shader_send_uniform_mat4(&shader, model_matrix, "model");
       
-        glDrawElements(GL_TRIANGLES,
-                      sizeof(cube_indices) / sizeof(GLushort),
-                      GL_UNSIGNED_SHORT,
-                      0);
+        // glDrawElements(GL_TRIANGLES,
+        //               sizeof(cube_indices) / sizeof(GLushort),
+        //               GL_UNSIGNED_SHORT,
+        //               0);
       break;
     }
 

@@ -19,6 +19,7 @@ out vec3 color_from_vert;
 
 void main()
 {
+  mat4 model = model_grid[gl_InstanceID];
 
   vec4 original_position = vec4(attribute_pos.x, attribute_pos.y, attribute_pos.z, 1.0f);
   gl_Position = projection * view * model * original_position;
