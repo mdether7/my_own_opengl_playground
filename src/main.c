@@ -4,6 +4,7 @@
 #include <cglm/quat.h>
 
 #include "object.h"
+#include "grid.h"
 #include "shader.h"
 #include "cube.h"
 
@@ -201,25 +202,8 @@ int main(void)
     return 1;
 
   
-#if 0
-  float spacing = 1.0f;
-  float gap     = 0.0f;
-
-  for (int i = 0; i < 10; i++)
-    for (int j = 0; j < 10; j++)
-      for (int k = 0; k < 10; k++) {
-
-        mat4 destination_mat;
-
-        glmc_mat4_identity(destination_mat);
-        glmc_translate(destination_mat, (vec3){i*(spacing+gap), j*(spacing+gap), k*(spacing+gap)});
-
-        glmc_mat4_print(destination_mat, stdout);
-        
-      }
-#endif
-
-
+  // load grid
+  Grid_object* grid = grid_create((Dimensions){3, 3, 3}, (vec3){0, 0, 0}, 1.0f, &cube);
 
   // openGL options
   glEnable(GL_DEPTH_TEST);
@@ -231,6 +215,7 @@ int main(void)
 
   while (!glfwWindowShouldClose(window))
   {
+    static int t = 0;
     process_input(window);
 
     // clear screen
@@ -248,8 +233,12 @@ int main(void)
     shader_send_uniform_int(&shader, debug_colors_draw ? 1 : 0, "debug_color_flag");
     shader_send_uniform_vec3(&shader, 6, (float*)cube_alternative_color, "debug_color_array");
     shader_send_uniform_mat4(&shader, model_matrix, "model");
-    shader_send_uniform_mat4(&shader, view_matrix, "view");
-    shader_send_uniform_mat4(&shader, projection_matrix, "projection");
+    
+    if (t++ == 0) { // DIRTY FLAG ALPHA 
+      // Only update those when camera/projection change
+      shader_send_uniform_mat4(&shader, view_matrix, "view");
+      shader_send_uniform_mat4(&shader, projection_matrix, "projection");
+    }
     
     // render
     switch (current_model)
@@ -290,6 +279,8 @@ int main(void)
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+
+  grid_destroy(grid);
 
   shader_destroy(&shader);
   object_destroy(&cube);

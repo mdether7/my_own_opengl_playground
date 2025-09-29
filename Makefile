@@ -17,6 +17,8 @@ SRC= src/main.c \
 		 src/glad.c \
 		 src/utils/file_read.c \
 		 src/object.c \
+		 src/dims.c \
+		 src/grid.c \
 		 src/shader.c
 		 
 OBJS= $(SRC:%.c=%.o)

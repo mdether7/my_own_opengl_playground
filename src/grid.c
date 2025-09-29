@@ -6,16 +6,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-   // WIP WIP SHIT // TENTEN
-  // Dimensions       dims;
-  // vec3             pos;
-
-  // const Object*    primitives;
-
-  // mat4*            model_matrices;
-  // size_t           matrix_count;    
-  // size_t           matrix_bytes;
-
 void grid_destroy(Grid_object* grid)
 {
   if (grid != NULL) {
@@ -24,7 +14,7 @@ void grid_destroy(Grid_object* grid)
   }
 }
 
-Grid_object* grid_create(Dimensions dims, const vec3 star_pos, float spacing, const Object* primitive)
+Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Object* primitive)
 {
   if (primitive == NULL)
     return NULL;
@@ -53,9 +43,9 @@ Grid_object* grid_create(Dimensions dims, const vec3 star_pos, float spacing, co
 
   float gap = 0.0f;
   size_t count = 0;
-  for (int i = 0; i < dims.width; i++)
-    for (int j = 0; j < dims.height; j++)
-      for (int k = 0; k < dims.depth; k++) {
+  for (unsigned int i = 0; i < dims.width; i++)
+    for (unsigned int j = 0; j < dims.height; j++)
+      for (unsigned int k = 0; k < dims.depth; k++) {
 
         mat4 mat;
 
