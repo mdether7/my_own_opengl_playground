@@ -251,7 +251,7 @@ int main(void)
     update_cube(glfwGetTime());
 
     glmc_mat4_identity(view_matrix);
-    glm_lookat((vec3){0.0f, 0.0f, 50.0f}, (vec3){-ff, ff, 0.0f}, (vec3){0.0f, 1.0f, 0.0f}, view_matrix);
+    glm_lookat((vec3){0.0f, 0.0f, 50.0f}, (vec3){-ff, ff, ff / 2}, (vec3){0.0f, 1.0f, 0.0f}, view_matrix);
     glmc_perspective(glm_rad(60.0f), ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT), 0.1f, 100.0f, projection_matrix);
 
     shader_bind(&shader);
@@ -263,19 +263,39 @@ int main(void)
     shader_send_uniform_mat4(&shader, view_matrix, "view");
     shader_send_uniform_mat4(&shader, projection_matrix, "projection");
 
+    // THIS IS LESS EFFICEINT OR SOMETHING // 
+    // glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
+
+    // mat4* matrices = (mat4*)glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+    // if (matrices) {
+    //   // change first matrix
+    //   for (int i = 0; i < grid->matrix_count; i++) {
+    //     glmc_mat4_copy(grid->model_matrices[i], matrices[i]);
+    //     glmc_translate(matrices[i], (vec3){0.0f, (float)sin(glfwGetTime()) * 5.0f, 0.0f});
+    //   }
+      
+    //   // change more matrices as needed...
+      
+    //   glUnmapBuffer(GL_UNIFORM_BUFFER);
+    // }
+
+    // glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
     glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
 
-    mat4* matrices = (mat4*)glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+    mat4* matrices = (mat4*)glMapBufferRange(
+        GL_UNIFORM_BUFFER,
+        0,                       // offset
+        grid->matrix_bytes,      // size of the buffer
+        GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
+    );
+
     if (matrices) {
-      // change first matrix
-      for (int i = 0; i < grid->matrix_count; i++) {
-        glmc_mat4_copy(grid->model_matrices[i], matrices[i]);
-        glmc_translate(matrices[i], (vec3){0.0f, (float)sin(glfwGetTime()) * 5.0f, 0.0f});
-      }
-      
-      // change more matrices as needed...
-      
-      glUnmapBuffer(GL_UNIFORM_BUFFER);
+        for (int i = 0; i < grid->matrix_count; i++) {
+            glmc_mat4_copy(grid->model_matrices[i], matrices[i]);
+            glmc_translate(matrices[i], (vec3){0.0f, (float)sin(glfwGetTime()), 0.0f});
+        }
+        glUnmapBuffer(GL_UNIFORM_BUFFER);
     }
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
