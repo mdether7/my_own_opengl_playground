@@ -2,19 +2,21 @@
 #define R_SCENE_OBJECTS_H
 
 #include "R_mesh.h"
+#include "R_material.h"
+#include "R_transform.h"
 
 #include <stddef.h>
 
-typedef struct r_object_s {
-
-  R_Mesh*      mesh;
-
-} R_Object;
+#define SCENE_MAX_OBJECTS 100
 
 typedef struct r_scene_s {
 
-  R_Object*    objects;
-  size_t       size_in_bytes;
+  R_Mesh*      meshe;
+  R_Material*  materials;
+  R_Transform* trasforms;
+
+  unsigned int count;
+  unsigned int capacity;
 
 } R_Scene;
 

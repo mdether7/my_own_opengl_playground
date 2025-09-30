@@ -3,9 +3,9 @@
 #include <cglm/call.h>
 #include <cglm/quat.h>
 
-#include "mesh.h"
+#include "R_mesh.h"
 #include "grid.h"
-#include "shader.h"
+#include "R_shader.h"
 #include "cube.h"
 
   // MATRIX CHEAT SHEET
@@ -189,7 +189,7 @@ int main(void)
   }
 
   // load meshes
-  Mesh cube;
+  R_Mesh cube;
   int result = -1;
   result = mesh_create(&cube, cube_attribs, (float*)cube_vertices, cube_indices, 2, 6, 24, 36);
   if (result < 0)

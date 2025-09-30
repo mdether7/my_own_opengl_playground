@@ -96,7 +96,7 @@ mesh_unbind(void)
 }
 
 void
-mesh_destroy(Mesh* mesh)
+mesh_destroy(R_Mesh* mesh)
 {
 // glGenBuffers(1, &obj->VBO);     // Generate - pass by address
 // glDeleteBuffers(1, &obj->VBO);  // Delete - pass by address 
