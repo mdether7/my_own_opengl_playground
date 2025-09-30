@@ -1,7 +1,7 @@
 #ifndef MY_SHADER_H
 #define MY_SHADER_H
 
-#include "shader_type.h"
+#include "R_shader_type.h"
 
 #include <cglm/types.h>
 

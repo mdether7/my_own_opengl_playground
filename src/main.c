@@ -3,7 +3,7 @@
 #include <cglm/call.h>
 #include <cglm/quat.h>
 
-#include "object.h"
+#include "mesh.h"
 #include "grid.h"
 #include "shader.h"
 #include "cube.h"
@@ -14,12 +14,11 @@
   // [02 12 22 32]
   // [03 13 23 33]
 
-  // CPU Frame
-  // update_game_logic();           // Positions, rotations
-  // dispatch_compute_culling();    // GPU does frustum culling
-  // dispatch_compute_animation();  // GPU builds final matrices
-  // draw_indirect();              // GPU draws visible objects
-
+  // GOOD separations:
+  // Mesh           // Geometry (VAO+VBO+EBO together)
+  // Material       // Shader + uniforms + textures
+  // Transform      // Position/rotation/scale
+  // Render_object  // Mesh + Material + Transform
 
 typedef enum { IDLE = 0, FORWARD, BACKWARD, TO_LEFT, TO_RIGHT } cube_state;
 typedef enum { CUBE = 0, RUBIX } model;
@@ -177,28 +176,22 @@ int main(void)
     return 1;
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-
 		fprintf(stderr, "Failed to initialize GLAD!\n");
-
 		glfwTerminate();
-
 		return 1;
 	} 
 
   Shader_program shader;
   if (shader_create(&shader, "res/cube.vert", "res/cube.frag") != 0) {
-
     fprintf(stderr, "Failed shader creation!\n");
-
     glfwTerminate();
-
     return 1;
   }
 
-  // load primitive shapes
-  Object cube;
+  // load meshes
+  Mesh cube;
   int result = -1;
-  result = object_create(&cube, &shader, cube_attribs, (float*)cube_vertices, cube_indices, 2, 6, 24, 36);
+  result = mesh_create(&cube, cube_attribs, (float*)cube_vertices, cube_indices, 2, 6, 24, 36);
   if (result < 0)
     return 1;
 
@@ -222,8 +215,6 @@ int main(void)
 
   // bind buffer to thie GRID_BIND_SPOT
   glBindBufferBase(GL_UNIFORM_BUFFER, GRID_BIND_SPOT, grid->UBO);
-
-
 
 
 
@@ -302,20 +293,21 @@ int main(void)
 
     
     // render
-    object_bind(&cube);
+    mesh_bind(&cube);
     switch (current_model)
     {
       case CUBE:
         glDrawElements(GL_TRIANGLES,
-                      sizeof(cube_indices) / sizeof(GLushort),
-                      GL_UNSIGNED_SHORT,
-                      0);
+                       sizeof(cube_indices) / sizeof(GLuint),
+                       GL_UNSIGNED_SHORT,
+                       0);
       break;
       case RUBIX:
         // Draw all instances in one drwa call
+        glPointSize(5.0f);
         glDrawElementsInstanced(GL_TRIANGLES,
-                                sizeof(cube_indices) / sizeof(GLushort),
-                                GL_UNSIGNED_SHORT,
+                                sizeof(cube_indices) / sizeof(GLuint),
+                                GL_UNSIGNED_INT,
                                 0,
                                 grid->matrix_count);
         // glDrawElements(GL_TRIANGLES,
@@ -349,7 +341,7 @@ int main(void)
   grid_destroy(grid);
 
   shader_destroy(&shader);
-  object_destroy(&cube);
+  mesh_destroy(&cube);
 
   glfwDestroyWindow(window);
   glfwTerminate();

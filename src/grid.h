@@ -1,7 +1,8 @@
 #ifndef MY_MODEL_H
 #define MY_MODEL_H
 
-#include "dims.h"
+#include "H_dims.h"
+#include "R_mesh.h"
 
 #include <cglm/types.h>
 #include <glad/glad.h>
@@ -16,7 +17,7 @@ typedef struct grid_object_s {
   Dimensions       dims;
   vec3             pos;
 
-  const Object*    primitive;
+  const Mesh*      primitive;
 
   GLuint           UBO; 
   mat4*            model_matrices;
@@ -27,8 +28,7 @@ typedef struct grid_object_s {
 
 // TODO(mdether7): ADD SCALING OR SOME SHIT tO THOSE GRID TYPE OBJECTS
 
-Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Object* primitive);
-void         grid_resize(Grid_object* grid, vec3 dims);
+Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Mesh* primitive);
 void         grid_destroy(Grid_object* grid);
 
 

@@ -17,7 +17,8 @@ SRC= src/main.c \
 		 src/glad.c \
 		 src/utils/file_read.c \
 		 src/object.c \
-		 src/dims.c \
+		 src/mesh.c \
+		 src/utils/dims.c \
 		 src/grid.c \
 		 src/shader.c
 		 

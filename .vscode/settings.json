@@ -5,6 +5,7 @@
     "shader_type.h": "c",
     "glad.h": "c",
     "dims.h": "c",
-    "grid.h": "c"
+    "grid.h": "c",
+    "vertex_type.h": "c"
   }
 }

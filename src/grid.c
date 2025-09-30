@@ -1,6 +1,7 @@
 #include "grid.h"
 
-#include "dims.h"
+#include "utils/dims.h"
+#include "mesh.h"
 
 #include <cglm/call.h>
 #include <glad/glad.h>
@@ -16,7 +17,7 @@ void grid_destroy(Grid_object* grid)
   }
 }
 
-Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Object* primitive)
+Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Mesh* primitive)
 {
   if (primitive == NULL)
     return NULL;
@@ -65,7 +66,7 @@ Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Ob
   grid->UBO = 0;
   glGenBuffers(1, &grid->UBO);
   glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
-  glBufferData(GL_UNIFORM_BUFFER, grid->matrix_bytes, grid->model_matrices, GL_STATIC_DRAW);
+  glBufferData(GL_UNIFORM_BUFFER, grid->matrix_bytes, grid->model_matrices, GL_DYNAMIC_DRAW);
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
   return grid;
