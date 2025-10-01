@@ -1,6 +1,22 @@
 #include "E_scene.h"
+#include "E_object.h"
 
 #include <stdlib.h>
+
+void
+e_scene_add_object(E_Scene* scene, E_Object object)
+{
+  if (scene == NULL) 
+    return;
+
+  if (scene->count >= scene->capacity)
+    return;
+
+  scene->meshes[scene->count] = object.mesh;
+  scene->materials[scene->count] = object.material;
+  scene->transforms[scene->count] = object.transform;
+  scene->count++;
+}
 
 E_Scene* 
 e_scene_create(void)
@@ -28,14 +44,16 @@ e_scene_create(void)
   return scene;
 }
 
-
 void
 e_scene_destroy(E_Scene* scene)
 {
   if (scene != NULL) {
+
+    // cleanup mesh/materials/transforms in a loop
+
     free(scene->meshes);
     free(scene->materials);
     free(scene->transforms);
-    scene->count = scene->capacity = 0;
+    free(scene);
   }  
 }

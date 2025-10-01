@@ -1,10 +1,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "E_scene.h"
+#include "E_object.h"
 #include "E_primitives.h"
 
 #include "R_renderer.h"
-#include "E_scene.h"
 
 // THANKS CHAT!
 // +-----------------------------------------------------+
@@ -102,9 +103,15 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  // CREATE RENDERER;
+
   e_primitives_init();
-  
-  R_Renderer* renderer = r_renderer_create();
+  E_Scene* default_scene = e_scene_create();
+  if (default_scene == NULL)
+    return 1;
+
+  E_Object platform = {.mesh = g_cube_primitive};
+
 
 
   while (!glfwWindowShouldClose(window))
@@ -119,6 +126,7 @@ int main(int argc, char* argv[])
   }
 
   e_primitives_destroy();
+  e_scene_destroy(default_scene);
 
   glfwDestroyWindow(window);
   glfwTerminate();

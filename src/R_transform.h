@@ -5,7 +5,7 @@
 
 typedef struct r_transform_s {
   vec3 position;
-  vec3 rotation;
+  mat4 rotation;
   vec3 scale;
 } R_Transform;
 

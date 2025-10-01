@@ -18,14 +18,14 @@ typedef struct r_mesh_s {
 } R_Mesh;
 
 int
-r_mesh_create(R_Mesh*                 mesh,        // object to be created
+r_mesh_create(R_Mesh*                 mesh,    // object to be created
             const Vertex_attrib*  attribs,     // data of the layout
             const float*          vertex_data,
-            const GLuint*       index_data,  // indices
+            const GLuint*       index_data,    // indices
             size_t number_of_attributes,       // length of attribs
             size_t single_vertex_size,       
             size_t num_of_vertices, 
-            size_t num_of_indices); 
+            size_t num_of_indices);
 
 int
 r_mesh_bind(const R_Mesh* mesh);

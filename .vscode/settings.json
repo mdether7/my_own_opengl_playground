@@ -8,6 +8,7 @@
     "grid.h": "c",
     "vertex_type.h": "c",
     "r_renderer.h": "c",
-    "r_scene.h": "c"
+    "r_scene.h": "c",
+    "r_mesh.h": "c"
   }
 }

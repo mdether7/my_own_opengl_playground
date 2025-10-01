@@ -1,6 +1,8 @@
 #ifndef E_SCENE_H
 #define E_SCENE_H
 
+#include "E_object.h"
+
 #include "R_mesh.h"
 #include "R_material.h"
 #include "R_transform.h"
@@ -23,5 +25,6 @@ typedef struct e_scene_s {
 
 E_Scene* e_scene_create(void);
 void     e_scene_destroy(E_Scene* scene);
+void     e_scene_add_object(E_Scene* scene, E_Object object);
 
 #endif
