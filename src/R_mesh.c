@@ -6,7 +6,7 @@
 #include <assert.h>
 
 int
-mesh_create(R_Mesh*                 mesh,
+r_mesh_create(R_Mesh*                 mesh,
             const Vertex_attrib*  attribs,
             const float*          vertex_data,
             const GLuint*       index_data,
@@ -83,20 +83,20 @@ mesh_create(R_Mesh*                 mesh,
 }
 
 int
-mesh_bind(const R_Mesh* mesh)
+r_mesh_bind(const R_Mesh* mesh)
 {
   glBindVertexArray(mesh->VAO);
   return 0;
 }
 
 void
-mesh_unbind(void)
+r_mesh_unbind(void)
 {
   glBindVertexArray(0);
 }
 
 void
-mesh_destroy(R_Mesh* mesh)
+r_mesh_destroy(R_Mesh* mesh)
 {
 // glGenBuffers(1, &obj->VBO);     // Generate - pass by address
 // glDeleteBuffers(1, &obj->VBO);  // Delete - pass by address 

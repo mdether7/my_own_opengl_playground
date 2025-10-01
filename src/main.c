@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "E_primitives.h"
+
 #include "R_renderer.h"
 #include "R_scene.h"
 
@@ -80,6 +82,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
+  e_primitives_init();
 
   while (!glfwWindowShouldClose(window))
   {
@@ -91,6 +94,8 @@ int main(int argc, char* argv[])
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+
+  e_primitives_destroy();
 
   glfwDestroyWindow(window);
   glfwTerminate();

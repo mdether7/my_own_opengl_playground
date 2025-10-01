@@ -6,7 +6,7 @@
 // forward declaration fuckery
 typedef struct r_mesh_s R_Mesh;
 
-extern R_Mesh* cube;
+extern R_Mesh* cube_primitive;
 
 int  e_primitives_init(void);
 void e_primitives_destroy(void);
