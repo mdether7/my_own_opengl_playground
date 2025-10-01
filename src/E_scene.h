@@ -1,5 +1,5 @@
-#ifndef R_SCENE_OBJECTS_H
-#define R_SCENE_OBJECTS_H
+#ifndef E_SCENE_H
+#define E_SCENE_H
 
 #include "R_mesh.h"
 #include "R_material.h"
@@ -9,16 +9,18 @@
 
 #define SCENE_MAX_OBJECTS 1000
 
-typedef struct r_scene_s {
+typedef struct e_scene_s {
 
   // ecs style objects
   R_Mesh*      meshes;
   R_Material*  materials;
-  R_Transform* trasforms;
+  R_Transform* transforms;
 
   unsigned int count;
   unsigned int capacity;
 
-} R_Scene;
+} E_Scene;
+
+E_Scene* r_scene_create(void);
 
 #endif

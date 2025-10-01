@@ -4,7 +4,27 @@
 #include "E_primitives.h"
 
 #include "R_renderer.h"
-#include "R_scene.h"
+#include "E_scene.h"
+
+// THANKS CHAT!
+// +-----------------------------------------------------+
+// | Application / Game Logic                             |
+// | - Game loop, input handling, AI, gameplay systems  |
+// +-----------------------------------------------------+
+// | Engine / Subsystems                                  |
+// | - Scene management (entities, components)          |
+// | - Physics, collision, animation                     |
+// | - Audio, networking                                 |
+// +-----------------------------------------------------+
+// | Renderer / Graphics                                  |
+// | - Meshes, shaders, textures, materials             |
+// | - Cameras, lights, framebuffers                    |
+// | - Low-level graphics API (OpenGL, Vulkan, DX)      |
+// +-----------------------------------------------------+
+// | Platform Abstraction / OS layer                     |
+// | - Windowing, input devices, timers                 |
+// | - File I/O                                         |
+// +-----------------------------------------------------+
 
 static int   SCREEN_WIDTH  = 800;
 static int   SCREEN_HEIGHT = 600;
@@ -83,6 +103,8 @@ int main(int argc, char* argv[])
   }
 
   e_primitives_init();
+  R_Renderer* renderer = r_renderer_create();
+
 
   while (!glfwWindowShouldClose(window))
   {

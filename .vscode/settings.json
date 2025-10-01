@@ -6,6 +6,8 @@
     "glad.h": "c",
     "dims.h": "c",
     "grid.h": "c",
-    "vertex_type.h": "c"
+    "vertex_type.h": "c",
+    "r_renderer.h": "c",
+    "r_scene.h": "c"
   }
 }
