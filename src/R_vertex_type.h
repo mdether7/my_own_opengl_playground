@@ -6,8 +6,6 @@
 typedef struct vertex_s {
 
   vec3 position;
-
-  vec3 color;
   
 } Vertex;
 

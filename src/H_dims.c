@@ -1,4 +1,4 @@
-#include "h_dims.h"
+#include "H_dims.h"
 
 unsigned int dimensions_get_volume(const Dimensions dims)
 {

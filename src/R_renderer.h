@@ -19,6 +19,8 @@ typedef struct r_renderer_s {
 // returns null on failure
 R_Renderer* r_renderer_create(R_Renderer* renderer);
 void        r_renderer_destroy(R_Renderer* renderer);
+
+void        r_renderer_render_scene(R_Renderer* renderer);
  
 
 

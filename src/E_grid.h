@@ -17,7 +17,7 @@ typedef struct grid_object_s {
   Dimensions       dims;
   vec3             pos;
 
-  const Mesh*      primitive;
+  const R_Mesh*      primitive;
 
   GLuint           UBO; 
   mat4*            model_matrices;
@@ -28,7 +28,7 @@ typedef struct grid_object_s {
 
 // TODO(mdether7): ADD SCALING OR SOME SHIT tO THOSE GRID TYPE OBJECTS
 
-Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Mesh* primitive);
+Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const R_Mesh* primitive);
 void         grid_destroy(Grid_object* grid);
 
 

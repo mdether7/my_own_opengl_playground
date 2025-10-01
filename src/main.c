@@ -1,49 +1,16 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <cglm/call.h>
-#include <cglm/quat.h>
 
-#include "R_mesh.h"
-#include "grid.h"
-#include "R_shader.h"
-#include "cube.h"
+#include "R_renderer.h"
+#include "R_scene.h"
 
-  // MATRIX CHEAT SHEET
-  // [00 10 20 30]
-  // [01 11 21 31]
-  // [02 12 22 32]
-  // [03 13 23 33]
-
-  // GOOD separations:
-  // Mesh           // Geometry (VAO+VBO+EBO together)
-  // Material       // Shader + uniforms + textures
-  // Transform      // Position/rotation/scale
-  // Render_object  // Mesh + Material + Transform
-
-typedef enum { IDLE = 0, FORWARD, BACKWARD, TO_LEFT, TO_RIGHT } cube_state;
-typedef enum { CUBE = 0, RUBIX } model;
-
-static int  SCREEN_WIDTH  = 800;
-static int SCREEN_HEIGHT  = 600;
-static char* WINDOW_NAME  = "CUBE";
-
-mat4 model_matrix         = GLM_MAT4_IDENTITY_INIT;
-mat4 view_matrix          = GLM_MAT4_IDENTITY_INIT;
-mat4 projection_matrix    = GLM_MAT4_IDENTITY_INIT;
-versor orientation        = GLM_QUAT_IDENTITY_INIT; // unused for now!
-
-cube_state current_cube_state = IDLE;
-model current_model           = RUBIX;
-float rotation_speed          = 2.0f;
-bool debug_colors_draw        = false;
+static int   SCREEN_WIDTH  = 800;
+static int   SCREEN_HEIGHT = 600;
+static char* WINDOW_NAME   = "CUBE";
 
 static GLFWwindow* initialize_glfw(unsigned int width, unsigned int height, const char* title);
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
-static void print_some_debug_info(void);
 static void process_input(GLFWwindow* window);
-static void rotate_cube(cube_state direction);
-static void update_cube(double time);
 
 static GLFWwindow* initialize_glfw(unsigned int width, unsigned int height, const char* title)
 {
@@ -56,6 +23,10 @@ static GLFWwindow* initialize_glfw(unsigned int width, unsigned int height, cons
 
   // Enable core profile of openGL
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
   GLFWwindow* window;
   window = glfwCreateWindow(width, height, title, NULL, NULL);
@@ -74,274 +45,52 @@ static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
   glfwGetWindowSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
   glViewport(0, 0, width, height);
 }
-
-static void update_cube(double time)
+static int initialize_opengl(void)
 {
-  static float rot_degrees = 0.0f;
-
-  // move the cube right spot
-  glmc_translate(model_matrix, (vec3){0.0f, (float)sin(glfwGetTime()), -5.0f});
-
-  if (current_cube_state != IDLE) 
-    rot_degrees += rotation_speed;
-
-  switch (current_cube_state)
-  {
-    case FORWARD:
-      glmc_rotate(model_matrix, glm_rad(-rot_degrees), (vec3){1.0f, 0.0f, 0.0f});
-    break;
-    case BACKWARD:
-      glmc_rotate(model_matrix, glm_rad(rot_degrees), (vec3){1.0f, 0.0f, 0.0f});
-    break;
-    case TO_RIGHT:
-      glmc_rotate(model_matrix, glm_rad(rot_degrees), (vec3){0.0f, 1.0f, 0.0f});
-    break;
-    case TO_LEFT:
-      glmc_rotate(model_matrix, glm_rad(-rot_degrees), (vec3){0.0f, 1.0f, 0.0f});
-    break;
-    case IDLE:
-    default:
-    break;
-  }
-
-#ifdef DEBUGprintf
-  glmc_mat4_print(model_matrix, stdout);
-  printf("%f", rot_degrees);
-  fflush(stdout);
-#endif
-
-  if (rot_degrees >= 90.0f) {
-    current_cube_state = IDLE;
-    rot_degrees = 0.0f;
-  }
-
-}
-
-static void rotate_cube(cube_state direction)
-{
-  if (current_cube_state != IDLE)
-    return;
-  
-  switch (direction)
-  {
-    case FORWARD:  current_cube_state = FORWARD; break;
-    case BACKWARD: current_cube_state = BACKWARD; break;
-    case TO_RIGHT: current_cube_state = TO_RIGHT; break;
-    case TO_LEFT:  current_cube_state = TO_LEFT; break;
-    default: return;
-  }
-  
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        fprintf(stderr, "Failed to initialize GLAD\n");
+        return -1;
+    }
+    
+    // Optional: Print OpenGL version info
+    printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
+    
+    return 0;
 }
 
 static void process_input(GLFWwindow* window)
-{
-  static bool space_held_down = false;
-  
-  // flag reset block //
-  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
-    space_held_down = false;
-
-  // input block // 
+{ 
   if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true); 
-  
-  // change model
-  if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    current_model = CUBE;
-  if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-    current_model = RUBIX;
-
-  // rotate model
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    rotate_cube(FORWARD);
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    rotate_cube(BACKWARD);
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    rotate_cube(TO_LEFT);
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    rotate_cube(TO_RIGHT);
-
-  // debug part
-  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !space_held_down) {
-    debug_colors_draw ^= 1;
-    space_held_down = true;
-  }
 }
 
-
-int main(void)
+int main(int argc, char* argv[])
 {
+  // suppress warnings for now
+  (void)argc;
+  (void)argv;
+
   GLFWwindow* window = initialize_glfw(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_NAME);
   if (window == NULL)
     return 1;
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		fprintf(stderr, "Failed to initialize GLAD!\n");
-		glfwTerminate();
-		return 1;
-	} 
-
-  Shader_program shader;
-  if (shader_create(&shader, "res/cube.vert", "res/cube.frag") != 0) {
-    fprintf(stderr, "Failed shader creation!\n");
+  if (initialize_opengl() < 0) {
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 1;
   }
 
-  // load meshes
-  R_Mesh cube;
-  int result = -1;
-  result = mesh_create(&cube, cube_attribs, (float*)cube_vertices, cube_indices, 2, 6, 24, 36);
-  if (result < 0)
-    return 1;
-
-  
-  // load grid
-  Grid_object* grid = grid_create((Dimensions){10, 10, 10}, (vec3){0, 0, 0}, 1.0f, &cube);
-  if (grid == NULL)
-    return 1;
-
-  printf("COUNT %zu\n", grid->matrix_count);
-  printf("BYTE %zu\n", grid->matrix_bytes);
-  fflush(stdout);
-
-  #define GRID_BIND_SPOT 0
-
-  // get index from the shader of this ubo block
-  GLuint grid_mats = glGetUniformBlockIndex(shader.ID, "Matrices");  
-  
-  // bind this spot to GRID_BIND_SPOT
-  glUniformBlockBinding(shader.ID, grid_mats, GRID_BIND_SPOT);
-
-  // bind buffer to thie GRID_BIND_SPOT
-  glBindBufferBase(GL_UNIFORM_BUFFER, GRID_BIND_SPOT, grid->UBO);
-
-
-
-
-  // openGL options
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);  
-  glClearDepth(1.0f);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-  print_some_debug_info();
 
   while (!glfwWindowShouldClose(window))
   {
     process_input(window);
 
-    // clear screen
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //update_scene(&scene);
+    //render();
 
-    float ff = 20.0f * (float)sin(glfwGetTime());
-    printf("%f", ff);
-
-    glmc_mat4_identity(model_matrix);
-    update_cube(glfwGetTime());
-
-    glmc_mat4_identity(view_matrix);
-    glm_lookat((vec3){0.0f, 0.0f, 50.0f}, (vec3){-ff, ff, ff / 2}, (vec3){0.0f, 1.0f, 0.0f}, view_matrix);
-    glmc_perspective(glm_rad(60.0f), ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT), 0.1f, 100.0f, projection_matrix);
-
-    shader_bind(&shader);
-
-    // send uniform data
-    shader_send_uniform_int(&shader, debug_colors_draw ? 1 : 0, "debug_color_flag");
-    shader_send_uniform_vec3(&shader, 6, (float*)cube_alternative_color, "debug_color_array");
-    shader_send_uniform_mat4(&shader, model_matrix, "model");
-    shader_send_uniform_mat4(&shader, view_matrix, "view");
-    shader_send_uniform_mat4(&shader, projection_matrix, "projection");
-
-    // THIS IS LESS EFFICEINT OR SOMETHING // 
-    // glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
-
-    // mat4* matrices = (mat4*)glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-    // if (matrices) {
-    //   // change first matrix
-    //   for (int i = 0; i < grid->matrix_count; i++) {
-    //     glmc_mat4_copy(grid->model_matrices[i], matrices[i]);
-    //     glmc_translate(matrices[i], (vec3){0.0f, (float)sin(glfwGetTime()) * 5.0f, 0.0f});
-    //   }
-      
-    //   // change more matrices as needed...
-      
-    //   glUnmapBuffer(GL_UNIFORM_BUFFER);
-    // }
-
-    // glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
-
-    mat4* matrices = (mat4*)glMapBufferRange(
-        GL_UNIFORM_BUFFER,
-        0,                       // offset
-        grid->matrix_bytes,      // size of the buffer
-        GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
-    );
-
-    if (matrices) {
-        for (int i = 0; i < grid->matrix_count; i++) {
-            glmc_mat4_copy(grid->model_matrices[i], matrices[i]);
-            glmc_translate(matrices[i], (vec3){0.0f, (float)sin(glfwGetTime()), 0.0f});
-        }
-        glUnmapBuffer(GL_UNIFORM_BUFFER);
-    }
-
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    
-    // render
-    mesh_bind(&cube);
-    switch (current_model)
-    {
-      case CUBE:
-        glDrawElements(GL_TRIANGLES,
-                       sizeof(cube_indices) / sizeof(GLuint),
-                       GL_UNSIGNED_SHORT,
-                       0);
-      break;
-      case RUBIX:
-        // Draw all instances in one drwa call
-        glPointSize(5.0f);
-        glDrawElementsInstanced(GL_TRIANGLES,
-                                sizeof(cube_indices) / sizeof(GLuint),
-                                GL_UNSIGNED_INT,
-                                0,
-                                grid->matrix_count);
-        // glDrawElements(GL_TRIANGLES,
-        //               sizeof(cube_indices) / sizeof(GLushort),
-        //               GL_UNSIGNED_SHORT,
-        //               0);
-
-        // glmc_translate(model_matrix, (vec3){2.0f, (float)sin(glfwGetTime()), -5.0f});
-        // shader_send_uniform_mat4(&shader, model_matrix, "model");
-      
-        // glDrawElements(GL_TRIANGLES,
-        //               sizeof(cube_indices) / sizeof(GLushort),
-        //               GL_UNSIGNED_SHORT,
-        //               0);
-      break;
-    }
-
-#ifdef DEBUG
-    if (debug_colors_draw)
-      printf("DEBUG!\n");
-    else
-      printf("NDEBUG!\n");
-    fflush(stdout);
-#endif
-
-    // swap and poll
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
-
-  grid_destroy(grid);
-
-  shader_destroy(&shader);
-  mesh_destroy(&cube);
 
   glfwDestroyWindow(window);
   glfwTerminate();
@@ -349,15 +98,128 @@ int main(void)
   return 0;
 }
 
-static void print_some_debug_info(void)
-{
-  GLint64 maxBlockSize = 0;
-  glGetInteger64v(GL_MAX_UNIFORM_BLOCK_SIZE, &maxBlockSize);
-  printf("Max UBO size: %lld bytes\n", (long long)maxBlockSize);
+// int old_main(void)
+// {
+//   GLFWwindow* window = initialize_glfw(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_NAME);
+//   if (window == NULL)
+//     return 1;
 
-  GLint bindings = 0;
-  glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &bindings);
 
-  printf("Max UBO bindings: %d\n", bindings);
-  fflush(stdout);
-}
+
+
+//   // openGL options
+//   glEnable(GL_DEPTH_TEST);
+//   glEnable(GL_CULL_FACE);
+//   glCullFace(GL_BACK);  
+//   glClearDepth(1.0f);
+//   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+//   while (!glfwWindowShouldClose(window))
+//   {
+//     process_input(window);
+
+//     // clear screen
+//     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+//     float ff = 20.0f * (float)sin(glfwGetTime());
+//     printf("%f", ff);
+
+//     glmc_mat4_identity(model_matrix);
+//     update_cube(glfwGetTime());
+
+//     glmc_mat4_identity(view_matrix);
+//     glm_lookat((vec3){0.0f, 0.0f, 50.0f}, (vec3){-ff, ff, ff / 2}, (vec3){0.0f, 1.0f, 0.0f}, view_matrix);
+//     glmc_perspective(glm_rad(60.0f), ((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT), 0.1f, 100.0f, projection_matrix);
+
+//     shader_bind(&shader);
+
+//     // send uniform data
+//     shader_send_uniform_int(&shader, debug_colors_draw ? 1 : 0, "debug_color_flag");
+//     shader_send_uniform_vec3(&shader, 6, (float*)cube_alternative_color, "debug_color_array");
+//     shader_send_uniform_mat4(&shader, model_matrix, "model");
+//     shader_send_uniform_mat4(&shader, view_matrix, "view");
+//     shader_send_uniform_mat4(&shader, projection_matrix, "projection");
+
+//     // THIS IS LESS EFFICEINT OR SOMETHING // 
+//     // glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
+
+//     // mat4* matrices = (mat4*)glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+//     // if (matrices) {
+//     //   // change first matrix
+//     //   for (int i = 0; i < grid->matrix_count; i++) {
+//     //     glmc_mat4_copy(grid->model_matrices[i], matrices[i]);
+//     //     glmc_translate(matrices[i], (vec3){0.0f, (float)sin(glfwGetTime()) * 5.0f, 0.0f});
+//     //   }
+      
+//     //   // change more matrices as needed...
+      
+//     //   glUnmapBuffer(GL_UNIFORM_BUFFER);
+//     // }
+
+//     // glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+//     glBindBuffer(GL_UNIFORM_BUFFER, grid->UBO);
+
+//     mat4* matrices = (mat4*)glMapBufferRange(
+//         GL_UNIFORM_BUFFER,
+//         0,                       // offset
+//         grid->matrix_bytes,      // size of the buffer
+//         GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
+//     );
+
+//     if (matrices) {
+//         for (int i = 0; i < grid->matrix_count; i++) {
+//             glmc_mat4_copy(grid->model_matrices[i], matrices[i]);
+//             glmc_translate(matrices[i], (vec3){0.0f, (float)sin(glfwGetTime()), 0.0f});
+//         }
+//         glUnmapBuffer(GL_UNIFORM_BUFFER);
+//     }
+
+//     glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    
+//     // render
+//     mesh_bind(&cube);
+//     switch (current_model)
+//     {
+//       case CUBE:
+//         glDrawElements(GL_TRIANGLES,
+//                        sizeof(cube_indices) / sizeof(GLuint),
+//                        GL_UNSIGNED_SHORT,
+//                        0);
+//       break;
+//       case RUBIX:
+//         // Draw all instances in one drwa call
+//         glPointSize(5.0f);
+//         glDrawElementsInstanced(GL_TRIANGLES,
+//                                 sizeof(cube_indices) / sizeof(GLuint),
+//                                 GL_UNSIGNED_INT,
+//                                 0,
+//                                 grid->matrix_count);
+//         // glDrawElements(GL_TRIANGLES,
+//         //               sizeof(cube_indices) / sizeof(GLushort),
+//         //               GL_UNSIGNED_SHORT,
+//         //               0);
+
+//         // glmc_translate(model_matrix, (vec3){2.0f, (float)sin(glfwGetTime()), -5.0f});
+//         // shader_send_uniform_mat4(&shader, model_matrix, "model");
+      
+//         // glDrawElements(GL_TRIANGLES,
+//         //               sizeof(cube_indices) / sizeof(GLushort),
+//         //               GL_UNSIGNED_SHORT,
+//         //               0);
+//       break;
+//     }
+
+//     // swap and poll
+//     glfwSwapBuffers(window);
+//     glfwPollEvents();
+//   }
+
+//   grid_destroy(grid);
+
+//   shader_destroy(&shader);
+//   mesh_destroy(&cube);
+
+//   return 0;
+// }

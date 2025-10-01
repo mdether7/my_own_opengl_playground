@@ -1,5 +1,5 @@
-#ifndef MY_DIMS_H
-#define MY_DIMS_H
+#ifndef H_DIMS_H
+#define H_DIMS_H
 
 typedef struct dimensions_s {
   unsigned int width;

@@ -3,10 +3,10 @@
 
 #include <glad/glad.h>
 
-#include "vertex_type.h"
+#include "R_vertex_type.h"
 #include <stddef.h>
 
-typedef struct mesh_s {
+typedef struct r_mesh_s {
 
   GLuint                VAO;
   GLuint                VBO;
@@ -18,7 +18,7 @@ typedef struct mesh_s {
 } R_Mesh;
 
 int
-mesh_create(R_Mesh*                 mesh,        // object to be created
+r_mesh_create(R_Mesh*                 mesh,        // object to be created
             const Vertex_attrib*  attribs,     // data of the layout
             const float*          vertex_data,
             const GLuint*       index_data,  // indices
@@ -28,12 +28,12 @@ mesh_create(R_Mesh*                 mesh,        // object to be created
             size_t num_of_indices); 
 
 int
-mesh_bind(const R_Mesh* mesh);
+r_mesh_bind(const R_Mesh* mesh);
 
 void
-mesh_unbind(void);
+r_mesh_unbind(void);
 
 void
-mesh_destroy(R_Mesh* mesh);
+r_mesh_destroy(R_Mesh* mesh);
 
 #endif

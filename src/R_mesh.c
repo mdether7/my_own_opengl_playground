@@ -1,5 +1,5 @@
 #include "R_mesh.h"
-#include "vertex_type.h"
+#include "R_vertex_type.h"
 
 #include <glad/glad.h>
 #include <stddef.h>

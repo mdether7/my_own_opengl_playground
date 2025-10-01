@@ -1,7 +1,7 @@
-#include "grid.h"
+#include "E_grid.h"
 
-#include "utils/dims.h"
-#include "mesh.h"
+#include "H_dims.h"
+#include "R_mesh.h"
 
 #include <cglm/call.h>
 #include <glad/glad.h>
@@ -17,7 +17,7 @@ void grid_destroy(Grid_object* grid)
   }
 }
 
-Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const Mesh* primitive)
+Grid_object* grid_create(Dimensions dims, vec3 star_pos, float spacing, const R_Mesh* primitive)
 {
   if (primitive == NULL)
     return NULL;

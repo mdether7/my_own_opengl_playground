@@ -1,4 +1,3 @@
-
 PROGRAM= myapp
 CC= gcc
 #cppflags are used for preprocessor (convention?)
@@ -15,13 +14,17 @@ BUILD ?= debug
 
 SRC= src/main.c \
 		 src/glad.c \
-		 src/utils/file_read.c \
-		 src/object.c \
-		 src/mesh.c \
-		 src/utils/dims.c \
-		 src/grid.c \
-		 src/shader.c
-		 
+		 src/E_primitives.c \
+		 src/E_grid.c \
+		 src/R_mesh.c \
+		 src/R_shader.c \
+		 src/R_camera.c \
+		 src/R_material.c \
+		 src/R_renderer.c \
+		 src/R_scene.c \
+		 src/H_dims.c \
+		 src/utils/file_read.c
+
 OBJS= $(SRC:%.c=%.o)
 DEPS= $(OBJS:%.o=%.d)
 

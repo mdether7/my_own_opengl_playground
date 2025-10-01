@@ -7,11 +7,12 @@
 
 #include <stddef.h>
 
-#define SCENE_MAX_OBJECTS 100
+#define SCENE_MAX_OBJECTS 1000
 
 typedef struct r_scene_s {
 
-  R_Mesh*      meshe;
+  // ecs style objects
+  R_Mesh*      meshes;
   R_Material*  materials;
   R_Transform* trasforms;
 
