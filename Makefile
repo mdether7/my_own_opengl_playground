@@ -14,6 +14,7 @@ BUILD ?= debug
 
 SRC= src/main.c \
 		 src/glad.c \
+		 src/E_scene.c \
 		 src/E_primitives.c \
 		 src/E_grid.c \
 		 src/R_mesh.c \
@@ -21,7 +22,6 @@ SRC= src/main.c \
 		 src/R_camera.c \
 		 src/R_material.c \
 		 src/R_renderer.c \
-		 src/R_scene.c \
 		 src/H_dims.c \
 		 src/utils/file_read.c
 

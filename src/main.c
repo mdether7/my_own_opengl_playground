@@ -103,6 +103,7 @@ int main(int argc, char* argv[])
   }
 
   e_primitives_init();
+  
   R_Renderer* renderer = r_renderer_create();
 
 

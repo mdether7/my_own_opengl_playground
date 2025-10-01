@@ -21,6 +21,7 @@ typedef struct e_scene_s {
 
 } E_Scene;
 
-E_Scene* r_scene_create(void);
+E_Scene* e_scene_create(void);
+void     e_scene_destroy(E_Scene* scene);
 
 #endif
