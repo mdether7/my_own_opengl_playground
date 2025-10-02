@@ -1,14 +1,9 @@
 #ifndef E_PRIMITIVES_H
 #define E_PRIMITIVES_H
 
-#include <stddef.h>
+typedef struct e_object_s E_Object;
 
-// forward declaration fuckery
-typedef struct r_mesh_s R_Mesh;
-
-extern R_Mesh g_cube_primitive;
-
-int  e_primitives_init(void);
-void e_primitives_destroy(void);
+E_Object* e_primitives_create_cube();
+void e_primitives_destroy_cube(E_Object* cube);
 
 #endif

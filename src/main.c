@@ -7,6 +7,8 @@
 
 #include "R_renderer.h"
 
+#include <stdio.h>
+
 static int   SCREEN_WIDTH  = 1200;
 static int   SCREEN_HEIGHT = 800;
 static char* WINDOW_NAME   = "CUBE";
@@ -73,6 +75,8 @@ int main(int argc, char* argv[])
   (void)argc;
   (void)argv;
 
+  int something_failed = 0;
+
   GLFWwindow* window = initialize_glfw(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_NAME);
   if (window == NULL)
     return 1;
@@ -83,16 +87,28 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  if (e_primitives_init() < 0)
-    return 1;
+  R_Renderer* renderer    = NULL;
+  R_Camera*   camera      = NULL;
+  E_Scene*    world_scene = NULL;
 
-  E_Scene* world_scene = e_scene_create();
-  if (world_scene == NULL)
-    return 1;
 
-  
-  
+  renderer = r_renderer_create();
+  if (renderer == NULL) {
+    something_failed = 1;
+    goto error_cleanup;
+  }
 
+  // camera = r_camera_create();
+  // if (camera == NULL) {
+  //   something_failed = 1;
+  //   goto error_cleanup;
+  // }
+
+  world_scene = e_scene_create();
+  if (world_scene == NULL) {
+    something_failed = 1;
+    goto error_cleanup;
+  }
 
   while (!glfwWindowShouldClose(window))
   {
@@ -105,10 +121,16 @@ int main(int argc, char* argv[])
     glfwPollEvents();
   }
 
-  e_primitives_destroy();
+error_cleanup:
+  r_renderer_destroy(renderer);
+  // r_camera_destroy(camera);
+  e_scene_destroy(world_scene);
 
   glfwDestroyWindow(window);
   glfwTerminate();
+
+  if (something_failed)
+    return 1;
 
   return 0;
 }

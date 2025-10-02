@@ -14,13 +14,15 @@ BUILD ?= debug
 
 SRC= src/main.c \
 		 src/glad.c \
+		 src/G_chunk.c \
 		 src/E_scene.c \
 		 src/E_primitives.c \
-		 src/E_grid.c \
 		 src/R_mesh.c \
 		 src/R_shader.c \
 		 src/R_camera.c \
 		 src/R_material.c \
+		 src/R_transform.c \
+		 src/R_texture.c \
 		 src/R_renderer.c \
 		 src/H_dims.c \
 		 src/utils/file_read.c

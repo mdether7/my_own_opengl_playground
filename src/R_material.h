@@ -5,8 +5,6 @@
 
 typedef struct r_material_s {
 
-  
-
 } R_Material;
 
 
