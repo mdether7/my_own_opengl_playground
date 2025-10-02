@@ -27,8 +27,8 @@
 // | - File I/O                                         |
 // +-----------------------------------------------------+
 
-static int   SCREEN_WIDTH  = 800;
-static int   SCREEN_HEIGHT = 600;
+static int   SCREEN_WIDTH  = 1200;
+static int   SCREEN_HEIGHT = 800;
 static char* WINDOW_NAME   = "CUBE";
 
 static GLFWwindow* initialize_glfw(unsigned int width, unsigned int height, const char* title);
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
   if (default_scene == NULL)
     return 1;
 
-  E_Object platform = {.mesh = g_cube_primitive};
+  
 
 
 
