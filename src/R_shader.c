@@ -17,23 +17,26 @@ shader_compile_error(GLuint shader);
 static int 
 shader_program_link_error(GLuint program);
 
-int
-shader_create(Shader_program* program, const char* vert_path, const char* frag_path)
+R_Shader_program*
+r_shader_create(const char* vert_path, const char* frag_path)
 {
-  program->ID = 0;
+  R_Shader_program* program = malloc(sizeof(*program));
+  if (program == NULL)  
+    return NULL;
+
   char*         vertex_source;
   char*         fragment_source;
 
   vertex_source = read_file(vert_path);
 
   if (vertex_source == NULL)
-    return -1;
+    return NULL;
 
   fragment_source = read_file(frag_path);
   
   if (fragment_source == NULL) {
     free(vertex_source);
-    return -1;
+    return NULL;
   }
 
   GLuint vertex_shader_object   = glCreateShader(GL_VERTEX_SHADER);
@@ -54,7 +57,7 @@ shader_create(Shader_program* program, const char* vert_path, const char* frag_p
     glDeleteShader(vertex_shader_object);  
     glDeleteShader(fragment_shader_object);
 
-    return -1;
+    return NULL;
   }
 
   program->ID = glCreateProgram();
@@ -69,46 +72,46 @@ shader_create(Shader_program* program, const char* vert_path, const char* frag_p
     glDeleteShader(vertex_shader_object);  
     glDeleteShader(fragment_shader_object);
 
-    return -1;
+    return NULL;
   }
 
   glDeleteShader(vertex_shader_object);
 	glDeleteShader(fragment_shader_object); 
 
-  return 0;
+  return program;
 }
 
 void 
-shader_destroy(Shader_program* program)
+r_shader_destroy(R_Shader_program* program)
 {
   if (program == NULL)
     return;
 
   glDeleteProgram(program->ID);
-  program->ID = 0;
+  free(program);
 }
 
 void 
-shader_bind(Shader_program* program)
+r_shader_bind(R_Shader_program* program)
 {
   assert(program != NULL);
   glUseProgram(program->ID);
 }
 
 void
-shader_send_uniform_vec3(Shader_program* program, unsigned int count, float* v, const char* uniform_name)
+r_shader_send_uniform_vec3(R_Shader_program* program, unsigned int count, float* v, const char* uniform_name)
 {
   glUniform3fv(glGetUniformLocation(program->ID, uniform_name), count, v);
 }
 
 void
-shader_send_uniform_mat4(Shader_program* program, mat4 m, const char* uniform_name)
+r_shader_send_uniform_mat4(R_Shader_program* program, mat4 m, const char* uniform_name)
 {
   glUniformMatrix4fv(glGetUniformLocation(program->ID, uniform_name), 1, GL_FALSE, &m[0][0]);
 }
 
 void
-shader_send_uniform_int(Shader_program* program, int value, const char* uniform_name)
+r_shader_send_uniform_int(R_Shader_program* program, int value, const char* uniform_name)
 {
   glUniform1i(glGetUniformLocation(program->ID, uniform_name), value);
 }

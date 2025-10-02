@@ -1,12 +1,12 @@
 #ifndef MY_T_SHADER_H
 #define MY_T_SHADER_H
 
-#include <glad/glad.h>
+typedef unsigned int GLuint;
 
-typedef struct Shader_program_s {
+typedef struct r_shader_program_s {
 
   GLuint       ID;
 
-} Shader_program;
+} R_Shader_program;
 
 #endif

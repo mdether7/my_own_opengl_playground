@@ -5,6 +5,7 @@
 #include "E_object.h"
 #include "E_primitives.h"
 
+#include "R_shader.h"
 #include "R_renderer.h"
 
 #include <stdio.h>
@@ -87,25 +88,17 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  R_Renderer* renderer    = NULL;
-  R_Camera*   camera      = NULL;
-  E_Scene*    world_scene = NULL;
-
+  R_Renderer*              renderer = NULL;
+  R_Camera*                  camera = NULL;
+  E_Scene*              world_scene = NULL;
+  R_Shader_program*  default_shader = NULL;
 
   renderer = r_renderer_create();
-  if (renderer == NULL) {
-    something_failed = 1;
-    goto error_cleanup;
-  }
-
-  // camera = r_camera_create();
-  // if (camera == NULL) {
-  //   something_failed = 1;
-  //   goto error_cleanup;
-  // }
-
+  camera = r_camera_create();
   world_scene = e_scene_create();
-  if (world_scene == NULL) {
+  default_shader = r_shader_create("res/default.vert", "res/default.frag");
+
+  if (!renderer || !camera || !world_scene || !default_shader) {
     something_failed = 1;
     goto error_cleanup;
   }
@@ -122,8 +115,10 @@ int main(int argc, char* argv[])
   }
 
 error_cleanup:
+  r_shader_destroy(default_shader);
   r_renderer_destroy(renderer);
-  // r_camera_destroy(camera);
+  r_camera_destroy(camera);
+  
   e_scene_destroy(world_scene);
 
   glfwDestroyWindow(window);

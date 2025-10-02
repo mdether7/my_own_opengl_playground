@@ -10,10 +10,10 @@
   // [03 13 23 33]
 
 typedef struct r_camera_s {
-  mat4 view;
-  mat4 projection;
   vec3 position;
-  vec3 target;
 } R_Camera;
+
+R_Camera* r_camera_create();
+void      r_camera_destroy(R_Camera* camera);
 
 #endif

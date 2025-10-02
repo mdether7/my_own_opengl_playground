@@ -5,21 +5,14 @@
 
 #include <cglm/types.h>
 
-typedef unsigned int GLuint;
+R_Shader_program* r_shader_create(const char* vert_path, const char* frag_path);
 
-int
-shader_create(Shader_program* program, const char* vert_path, const char* frag_path);
-void 
-shader_destroy(Shader_program* program);
-void 
-shader_bind(Shader_program* program);
-void
-shader_send_uniform_vec3(Shader_program* program, unsigned int count, float* v, const char* uniform_name);
-void
-shader_send_uniform_mat4(Shader_program* program, mat4 m, const char* uniform_name);
-void
-shader_send_uniform_int(Shader_program* program, int b, const char* uniform_name);
+void r_shader_destroy(R_Shader_program* program);
 
+void r_shader_bind(R_Shader_program* program);
 
+void r_shader_send_uniform_vec3(R_Shader_program* program, unsigned int count, float* v, const char* uniform_name);
+void r_shader_send_uniform_mat4(R_Shader_program* program, mat4 m, const char* uniform_name);
+void r_shader_send_uniform_int(R_Shader_program* program, int b, const char* uniform_name);
 
 #endif
