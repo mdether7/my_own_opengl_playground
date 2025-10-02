@@ -7,26 +7,6 @@
 
 #include "R_renderer.h"
 
-// THANKS CHAT!
-// +-----------------------------------------------------+
-// | Application / Game Logic                             |
-// | - Game loop, input handling, AI, gameplay systems  |
-// +-----------------------------------------------------+
-// | Engine / Subsystems                                  |
-// | - Scene management (entities, components)          |
-// | - Physics, collision, animation                     |
-// | - Audio, networking                                 |
-// +-----------------------------------------------------+
-// | Renderer / Graphics                                  |
-// | - Meshes, shaders, textures, materials             |
-// | - Cameras, lights, framebuffers                    |
-// | - Low-level graphics API (OpenGL, Vulkan, DX)      |
-// +-----------------------------------------------------+
-// | Platform Abstraction / OS layer                     |
-// | - Windowing, input devices, timers                 |
-// | - File I/O                                         |
-// +-----------------------------------------------------+
-
 static int   SCREEN_WIDTH  = 1200;
 static int   SCREEN_HEIGHT = 800;
 static char* WINDOW_NAME   = "CUBE";
@@ -103,15 +83,15 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // CREATE RENDERER;
+  if (e_primitives_init() < 0)
+    return 1;
 
-  e_primitives_init();
-  E_Scene* default_scene = e_scene_create();
-  if (default_scene == NULL)
+  E_Scene* world_scene = e_scene_create();
+  if (world_scene == NULL)
     return 1;
 
   
-
+  
 
 
   while (!glfwWindowShouldClose(window))
@@ -126,13 +106,32 @@ int main(int argc, char* argv[])
   }
 
   e_primitives_destroy();
-  e_scene_destroy(default_scene);
 
   glfwDestroyWindow(window);
   glfwTerminate();
 
   return 0;
 }
+
+// THANKS CHAT!
+// +-----------------------------------------------------+
+// | Application / Game Logic                             |
+// | - Game loop, input handling, AI, gameplay systems  |
+// +-----------------------------------------------------+
+// | Engine / Subsystems                                  |
+// | - Scene management (entities, components)          |
+// | - Physics, collision, animation                     |
+// | - Audio, networking                                 |
+// +-----------------------------------------------------+
+// | Renderer / Graphics                                  |
+// | - Meshes, shaders, textures, materials             |
+// | - Cameras, lights, framebuffers                    |
+// | - Low-level graphics API (OpenGL, Vulkan, DX)      |
+// +-----------------------------------------------------+
+// | Platform Abstraction / OS layer                     |
+// | - Windowing, input devices, timers                 |
+// | - File I/O                                         |
+// +-----------------------------------------------------+
 
 // int old_main(void)
 // {

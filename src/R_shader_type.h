@@ -3,8 +3,6 @@
 
 #include <glad/glad.h>
 
-typedef unsigned int GLuint;
-
 typedef struct Shader_program_s {
 
   GLuint       ID;
