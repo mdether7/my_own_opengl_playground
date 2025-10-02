@@ -76,22 +76,21 @@ int main(int argc, char* argv[])
   (void)argc;
   (void)argv;
 
-  int something_failed = 0;
+  int result = 1;
 
-  GLFWwindow* window = initialize_glfw(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_NAME);
-  if (window == NULL)
-    return 1;
-
-  if (initialize_opengl() < 0) {
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    return 1;
-  }
-
+  GLFWwindow*                window = NULL;
   R_Renderer*              renderer = NULL;
   R_Camera*                  camera = NULL;
   E_Scene*              world_scene = NULL;
   R_Shader_program*  default_shader = NULL;
+
+  window = initialize_glfw(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_NAME);
+  if (window == NULL)
+    goto error_cleanup;
+
+  if (initialize_opengl() < 0)
+    goto error_cleanup;
+
 
   renderer = r_renderer_create();
   camera = r_camera_create();
@@ -99,7 +98,6 @@ int main(int argc, char* argv[])
   default_shader = r_shader_create("res/default.vert", "res/default.frag");
 
   if (!renderer || !camera || !world_scene || !default_shader) {
-    something_failed = 1;
     goto error_cleanup;
   }
 
@@ -113,21 +111,19 @@ int main(int argc, char* argv[])
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+  result = 0;
 
 error_cleanup:
   r_shader_destroy(default_shader);
   r_renderer_destroy(renderer);
   r_camera_destroy(camera);
-  
+
   e_scene_destroy(world_scene);
 
   glfwDestroyWindow(window);
   glfwTerminate();
 
-  if (something_failed)
-    return 1;
-
-  return 0;
+  return result;
 }
 
 // THANKS CHAT!
