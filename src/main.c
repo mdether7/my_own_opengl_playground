@@ -58,7 +58,6 @@ static int initialize_opengl(void)
         return -1;
     }
     
-    // Optional: Print OpenGL version info
     printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
     
     return 0;
@@ -66,7 +65,8 @@ static int initialize_opengl(void)
 
 static void process_input(GLFWwindow* window)
 { 
-  if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+  if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS ||
+      glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true); 
 }
 
@@ -81,8 +81,9 @@ int main(int argc, char* argv[])
   GLFWwindow*                window = NULL;
   R_Renderer*              renderer = NULL;
   R_Camera*                  camera = NULL;
-  E_Scene*              world_scene = NULL;
   R_Shader_program*  default_shader = NULL;
+  E_Scene*              world_scene = NULL;
+
 
   window = initialize_glfw(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_NAME);
   if (window == NULL)
@@ -91,29 +92,37 @@ int main(int argc, char* argv[])
   if (initialize_opengl() < 0)
     goto error_cleanup;
 
-
-  renderer = r_renderer_create();
-  camera = r_camera_create();
-  world_scene = e_scene_create();
+  renderer       = r_renderer_create();
+  camera         = r_camera_create();
   default_shader = r_shader_create("res/default.vert", "res/default.frag");
+  world_scene    = e_scene_create();
 
-  if (!renderer || !camera || !world_scene || !default_shader) {
+  if (!renderer || !camera || !world_scene || !default_shader)
     goto error_cleanup;
-  }
+
+  r_renderer_set_scene(renderer, world_scene);
+  r_renderer_set_camera(renderer, camera);
 
   while (!glfwWindowShouldClose(window))
   {
     process_input(window);
 
+    glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     //update_scene(&scene);
-    //render();
+    r_renderer_render_scene(renderer);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+  // for now i assume we exited normally
+  // when the loop ends so yeah.
   result = 0;
 
 error_cleanup:
+
+  // clean up
   r_shader_destroy(default_shader);
   r_renderer_destroy(renderer);
   r_camera_destroy(camera);
